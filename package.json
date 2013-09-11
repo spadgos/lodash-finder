@@ -1,0 +1,7 @@
+{
+  "name": "lodash-finder",
+  "dependencies": {
+    "uglify-js": "1.3.5",
+    "underscore": "~1.5.2"
+  }
+}
