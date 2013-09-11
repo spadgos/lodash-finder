@@ -3,15 +3,38 @@ var lodashFinder = require('../lodash-finder'),
 
 [
   {
-    expected: ['reduce', 'each', 'map'],
+    message: 'Only top level methods should be returned',
     input: function () {
       _.reduce();
       _.bar.baz();
-      _.each();
       _.map();
       _.each();
       _();
-    }
+    },
+    expected: ['reduce', 'map', 'each']
+  },
+  {
+    message: 'Duplicates should be filtered',
+    input: function () {
+      _.reduce();
+      _.reduce();
+      _.reduce();
+      _.each();
+      _.each();
+    },
+    expected: ['reduce', 'each']
+  },
+  {
+    message: 'Comments and strings are not returned',
+    input: function () {
+      // _.map()
+      /* _.reduce() */
+      var x = '_.each()',
+          y = '_.filter()',
+          z;
+      z = y + x;
+    },
+    expected: []
   }
 ].forEach(function (test) {
   var input = 'x = ' + test.input.toString();
