@@ -1,5 +1,5 @@
 var lodashFinder = require('../index'),
-    _ = require('underscore');
+    _; // for jshint
 
 module.exports = {
   'Lodash Finder tests': function () {

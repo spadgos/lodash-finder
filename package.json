@@ -7,7 +7,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "underscore": "~1.5.2",
     "acorn": "~0.3.1"
   }
 }
