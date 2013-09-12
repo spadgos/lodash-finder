@@ -1,6 +1,5 @@
 ## lodash-finder
 
-
 An NPM module which searches for [Lodash][lodash]/[Underscore][underscore] methods used in your source.
 
 You might want to use this to create custom Lodash builds, using its `include` flag.
@@ -16,6 +15,7 @@ lodash --include=all,the,functions,you,are,using
 ```javascript
 var lodashFinder = require('lodash-finder');
 var functionsUsed = lodashFinder(sourceOfFile);
+// functionsUsed == ['each', 'map', 'template']
 ```
 
 ### TODO
