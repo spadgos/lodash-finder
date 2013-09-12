@@ -1,0 +1,3 @@
+[submodule "tyrtle"]
+	path = tyrtle
+	url = git@github.com:spadgos/tyrtle.git
