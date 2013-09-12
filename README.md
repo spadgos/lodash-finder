@@ -21,7 +21,6 @@ var functionsUsed = lodashFinder(sourceOfFile);
 ### TODO
 
 - Publish to NPM
-- Proper test library
 - Handle chaining method calls
 - Check for local aliasing of `_` (eg: `var _ = []; _.each()`)
 - Check for different import names for lodash (eg: `var lodash = require('lodash'); lodash.each(...)`)

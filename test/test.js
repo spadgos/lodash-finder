@@ -1,48 +1,50 @@
-var lodashFinder = require('../lodash-finder'),
+var lodashFinder = require('../index'),
     _ = require('underscore');
 
-[
-  {
-    message: 'Only top level methods should be returned',
-    input: function () {
-      _.reduce();
-      _.bar.baz();
-      _.map();
-      _.each();
-      _();
-    },
-    expected: ['reduce', 'map', 'each']
-  },
-  {
-    message: 'Duplicates should be filtered',
-    input: function () {
-      _.reduce();
-      _.reduce();
-      _.reduce();
-      _.each();
-      _.each();
-    },
-    expected: ['reduce', 'each']
-  },
-  {
-    message: 'Comments and strings are not returned',
-    input: function () {
-      // _.map()
-      /* _.reduce() */
-      var x = '_.each()',
-          y = '_.filter()',
-          z;
-      z = y + x;
-    },
-    expected: []
-  }
-].forEach(function (test) {
-  var input = 'x = ' + test.input.toString();
-  assert(_.difference(lodashFinder(input), test.expected).length === 0);
-});
+module.exports = {
+  'Lodash Finder tests': function () {
 
-function assert(test) {
-  if (!test) {
-    throw 'NOPE';
+    this.addAssertions({
+      containsLodash: function (inputFn, expectedMethods) {
+        var actual = lodashFinder('!' + inputFn.toString());
+        expectedMethods.sort();
+        actual.sort();
+        return this(actual).equals(expectedMethods)();
+      }
+    });
+
+    this.test('Only top level methods should be returned', function (assert) {
+      var input = function () {
+        _.reduce();
+        _.bar.baz();
+        _.map();
+        _.each();
+        _();
+      };
+      assert.that(input).containsLodash(['reduce', 'map', 'each'])();
+    });
+
+    this.test('Duplicates should be filtered', function (assert) {
+      var input = function () {
+        _.reduce();
+        _.reduce();
+        _.reduce();
+        _.each();
+        _.each();
+      };
+      assert.that(input).containsLodash(['reduce', 'each'])();
+    });
+
+    this.test('Comments and strings are not returned', function (assert) {
+      var input = function () {
+        // _.map()
+        /* _.reduce() */
+        var x = '_.each()',
+            y = '_.filter()',
+            z;
+        z = y + x;
+      };
+      assert.that(input).containsLodash([])();
+    });
   }
-}
+};
