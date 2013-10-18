@@ -1,6 +1,8 @@
 TYRTLE_DIR=tyrtle
 HARNESS=$(TYRTLE_DIR)/node-harness.js
 
+all: test
+
 test: $(HARNESS)
 	node $(HARNESS) test/**.js
 

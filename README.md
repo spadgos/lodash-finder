@@ -23,7 +23,6 @@ var functionsUsed = lodashFinder(sourceOfFile);
 - Publish to NPM
 - Handle chaining method calls
 - Check for local aliasing of `_` (eg: `var _ = []; _.each()`)
-- Check for different import names for lodash (eg: `var lodash = require('lodash'); lodash.each(...)`)
 - Helper function which will actually execute the lodash build with the given methods.
 - Ability to take a file or directory name as input
 
