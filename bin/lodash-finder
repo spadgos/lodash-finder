@@ -1,0 +1,91 @@
+#!/usr/bin/env node
+
+var lodash       = require('lodash-cli/bin/lodash'),
+    lodashFinder = require('../index'),
+    fs           = require('fs'),
+    glob         = require('glob'),
+    path         = require('path'),
+    log;
+
+log = console.log.bind(console);
+
+function build(inputPath, finderOptions, lodashOptions, callback) {
+  var include,
+      files;
+
+  files = subtract.apply(null, [inputPath].concat(finderOptions.exclude).map(pathToFiles));
+
+  include = files
+    .map(function (filePath) {
+      return fs.readFileSync(filePath, 'utf8');
+    })
+    .map(function (source, index) {
+      try {
+        return lodashFinder(source, finderOptions);
+      } catch (e) {
+        log('Error parsing ' + files[index]);
+        throw e;
+      }
+    })
+    .reduce(function (memo, arrIncludes) {
+      memo.push.apply(memo, subtract(arrIncludes, memo));
+      return memo;
+    }, []);
+
+  log("Found functions: " + include.join(', '));
+  lodashOptions.push('include=' + include.join(','));
+  lodash(lodashOptions, callback);
+}
+
+if (module !== require.main) {
+  module.exports = build;
+} else {
+  var args = process.argv,
+      input = args.splice(2, 1)[0],
+      exclude = [];
+
+  args = args.filter(function (arg) {
+    var parts = /--exclude=(.*)/.exec(arg);
+    if (parts) {
+      exclude.push(parts[1]);
+    }
+    return !parts;
+  });
+
+  build(input, { exclude: exclude }, args, function(data) {
+    var outputPath = data.outputPath,
+        sourceMap = data.sourceMap;
+
+    if (outputPath) {
+      fs.writeFileSync(outputPath, data.source, 'utf8');
+      if (sourceMap) {
+        fs.writeFileSync(path.join(path.dirname(outputPath), path.basename(outputPath, '.js') + '.map'), sourceMap, 'utf8');
+      }
+    }
+  });
+}
+
+function subtract(arr /*, arr2, ...*/) {
+  var others = Array.prototype.slice.call(arguments, 1);
+  return arr.filter(function (item) {
+    return others.every(doesntContain(item));
+  });
+}
+
+function doesntContain(origItem) {
+  return function (list) {
+    return list.indexOf(origItem) === -1;
+  };
+}
+
+function pathToFiles(input) {
+  if (input.indexOf('*') > -1) {
+    // glob pattern
+    return glob.sync(input);
+  } else if (/.\.[a-z0-9]+$/i.test(input)) {
+    // single file
+    return [input];
+  } else {
+    return glob.sync(path.join(input, '/**/*.js'));
+  }
+}

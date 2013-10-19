@@ -2,29 +2,51 @@
 
 An NPM module which searches for [Lodash][lodash]/[Underscore][underscore] methods used in your source.
 
-You might want to use this to create custom Lodash builds, using its `include` flag.
+You might want to use this to create custom Lodash builds, using its `include` flag without having to maintain the list of used functions manually.
 
 ```bash
 lodash --include=all,the,functions,you,are,using
 ```
 
-### Usage
+### Basic usage
 
-**Warning** this library is so alpha it hurts. Don't use it.
+The node module provides two functions:
+
+1. Parses a source file and returns an array of the lodash methods used.
+2. Gets the command to run to build lodash with the methods in the given source file.
 
 ```javascript
-var lodashFinder = require('lodash-finder');
-var functionsUsed = lodashFinder(sourceOfFile);
+lodashFinder = require('lodash-finder');
+functionsUsed = lodashFinder(sourceOfFile);
 // functionsUsed == ['each', 'map', 'template']
+
+buildCommand = lodashFinder.getBuildCmd(sourceOfFile, ['modern', '--output', 'lodash.js']);
+// buildCommand == 'lodash include=each,map,template modern --output lodash.js'
+```
+
+Additionally, there's an executable which essentially wraps lodash's cli, but passes on the methods to include.
+
+```shell
+$ lodash-finder src modern --output lodash.js
+```
+
+The command line tool accepts the exact same arguments as lodash's cli, with two differences. The first argument must be a path identifier to find the source files. Paths can be excluded from the source by passing any number of `--exclude=` arguments.
+
+Paths can be identified in three ways:
+
+- glob syntax, eg: `src/**/*.js`
+- a path to a directory, eg: `test`, which is then translated to `test/**/*.js`
+- a path to a single file, eg: `src/all.js`
+
+For example, to include the `src` directory but ignore vendor and test files:
+
+```bash
+$ lodash-finder src --exclude=src/test --exclude=src/vendor
 ```
 
 ### TODO
 
-- Publish to NPM
 - Handle chaining method calls
-- Check for local aliasing of `_` (eg: `var _ = []; _.each()`)
-- Helper function which will actually execute the lodash build with the given methods.
-- Ability to take a file or directory name as input
 
 [lodash]: https://github.com/lodash/lodash
 [underscore]: https://github.com/jashkenas/underscore
